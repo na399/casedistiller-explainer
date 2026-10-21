@@ -1,0 +1,22 @@
+{
+  "name": "casedistiller-explainer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Explainer video for the CaseDistiller manuscript, in the Plain Figure design system (UNC theme)",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render CaseDistillerExplainer out/casedistiller-explainer.mp4 --codec=h264",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.533",
+    "@remotion/google-fonts": "4.0.533",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.533"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}

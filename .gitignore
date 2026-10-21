@@ -1,0 +1,18 @@
+node_modules/
+out/
+
+# Voice data: reference recordings and every synthesised clip can clone the speaker's voice.
+narration/voice/*.wav
+narration/voice/*.m4a
+narration/voice/chunks/
+narration/voice/rejected/
+narration/voice/asr.log
+public/audio/
+
+# Credentials (the Bifrost .env normally lives one level up; never commit one here either)
+.env
+.env.*
+
+# Local tool output
+__pycache__/
+*.pyc
