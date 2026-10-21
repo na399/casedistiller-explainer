@@ -16,3 +16,4 @@ public/audio/
 # Local tool output
 __pycache__/
 *.pyc
+narration/voice/old-audio/

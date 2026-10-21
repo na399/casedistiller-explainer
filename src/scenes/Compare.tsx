@@ -93,22 +93,24 @@ const Distiller: React.FC<{ p: number }> = ({ p }) => (
   </svg>
 );
 
+// Each card: how the classifier is built (pro line) and what it is at inference (con line).
+// Descriptions only: no rankings, no unmeasured speed or cost claims.
 type Card = { head: string; Pic: React.FC<{ p: number }>; pro: string; con: string };
 const CARDS: Card[] = [
-  { head: "Human experts", Pic: Experts, pro: "Clinical judgement, and logic anyone can check and edit.", con: "Slow and costly; judgement varies with the reader and the hour." },
-  { head: "Classical NLP", Pic: Sieve, pro: "Deterministic and partly automated: ConText, cTAKES, medSpacy.", con: "Hard to set up, little clinical understanding, behind LLMs, and awkward to edit." },
-  { head: "Generative LLM", Pic: Model, pro: "Automated and strong on most tasks.", con: "One model call per note: a GPU, latency, privacy questions, and logic nobody can read." },
+  { head: "Expert rules", Pic: Experts, pro: "Experts write criteria from a case definition, as in published surveillance definitions.", con: "Explicit and editable; construction takes expert effort." },
+  { head: "Text classifiers", Pic: Sieve, pro: "Supervised models trained on labeled records.", con: "A representation of learned weights rather than readable criteria." },
+  { head: "Direct LLM classification", Pic: Model, pro: "A language model reads each record and answers the definition.", con: "Inference needs the model, with a call for every record." },
 ];
 
-// 2 · Three ways to a case definition, and a fourth
+// 2 · Ways to construct a case classifier
 export const Compare: React.FC = () => {
   const frame = useCurrentFrame();
   const colW = 262, gap = 18, cdW = 300;
   const cdAt = s(13);
   return (
     <Slide>
-      <Header kicker="The problem" width={1100} size={46}>
-        Every existing route to a case definition <Em at={s(1.2)}>gives something up</Em>.
+      <Header kicker="Constructing a classifier" width={1100} size={46}>
+        Each way to build a case classifier makes <Em at={s(1.2)}>different trade-offs</Em>.
       </Header>
       <div style={{ position: "absolute", top: 150, left: 0, display: "flex", gap }}>
         {CARDS.map((c, i) => {
@@ -133,17 +135,17 @@ export const Compare: React.FC = () => {
               <Distiller p={prog(frame, cdAt + 10, 36)} />
               <div style={{ ...T.title, fontSize: 22, color: C.tealDeep }}>CaseDistiller</div>
               <div style={{ ...T.body, fontSize: 16, lineHeight: "22px", opacity: prog(frame, cdAt + 20, 16) }}>
-                Clinical cues learned from labeled notes, readable and editable. Deterministic. One SQL query over the whole table, with no model call per note.
+                Executable rule learning: explicit criteria learned from labeled records; an LLM can optionally help during construction.
               </div>
-              <Caption style={{ color: C.ink, borderTop: `1px solid ${C.blue}40`, paddingTop: S.s2, opacity: prog(frame, cdAt + s(1.6), 16) }}>
-                Routes still need clinical review.
-              </Caption>
+              <div style={{ ...T.body, fontSize: 15, lineHeight: "21px", color: C.ink, borderTop: `1px solid ${C.blue}40`, paddingTop: S.s2, opacity: prog(frame, cdAt + s(1.6), 16) }}>
+                Deployment runs the resulting SQL query, with no LLM call.
+              </div>
             </div>
           </Panel>
         </Fade>
       </div>
       <Fade at={cdAt + s(3)} style={{ position: "absolute", bottom: 0, left: 0 }}>
-        <div style={{ ...T.lede, color: C.tealDeep, fontWeight: 700 }}>CaseDistiller keeps the advantages of all three, and runs far faster than a model.</div>
+        <div style={{ ...T.lede, color: C.tealDeep, fontWeight: 700 }}>The trade-offs: construction effort, representation, and what inference requires.</div>
       </Fade>
     </Slide>
   );
@@ -154,29 +156,29 @@ export const Tasks: React.FC = () => {
   const frame = useCurrentFrame();
   const corpora = [
     {
-      kicker: "EMS · suicide attempt", n: "1,842 records",
-      input: "Emergency medical services records: impression codes and text, with the crew's narrative.",
-      split: [1290, 277, 275], pos: "84 test attempts (30.5%)",
+      kicker: "EMS · suspected suicide attempt", role: "principal", n: "1,842 encounters",
+      input: "Structured fields and the crew's narrative. A suspected attempt act qualifies; ideation or an uninitiated plan alone does not.",
+      split: [1290, 277, 275], pos: "84 test positives (30.5%)",
     },
     {
-      kicker: "ACT · ten phenotypes", n: "1,610 discharge summaries",
+      kicker: "ACT · ten phenotypes", role: "principal", n: "1,610 discharge summaries",
       input: "MIMIC discharge summaries annotated for advanced cancer, heart, lung and neurological disease, chronic pain, alcohol and substance abuse, obesity, psychiatric disorders and depression.",
       split: [1127, 161, 322], pos: "25–92 test positives per phenotype",
     },
     {
-      kicker: "LCD · 30-day mortality", n: "49,832 discharge notes",
-      input: "Discharge notes; the label is death within 30 days of discharge, which the note rarely foreshadows.",
+      kicker: "LCD · 30-day mortality", role: "exploratory", n: "49,832 discharge notes",
+      input: "Discharge notes; the outcome is death within 30 days of discharge.",
       split: [34759, 7505, 7568], pos: "261 test deaths (3.4%)",
     },
   ];
   const W = 340;
   return (
     <Slide>
-      <Header kicker="The tasks" width={1100} size={46}>
-        Three corpora, three kinds of label, one <Em at={s(1.2)}>sealed test</Em> each.
+      <Header kicker="The tasks" width={1100} size={44}>
+        Two case-identification tasks, and <Em at={s(1.2)}>one exploratory outcome</Em>.
       </Header>
       <Fade at={s(1.6)} style={{ position: "absolute", top: 150, left: 0 }}>
-        <div style={{ ...T.lede, maxWidth: 1000 }}>Each task flags the records that meet a case definition, from the words of the note alone.</div>
+        <div style={{ ...T.lede, maxWidth: 1000 }}>Each task flags the records that meet a definition, with training, validation and held-out test splits.</div>
       </Fade>
       <div style={{ position: "absolute", top: 210, left: 0, display: "flex", gap: 18 }}>
         {corpora.map((c, i) => {
@@ -187,7 +189,10 @@ export const Tasks: React.FC = () => {
             <Fade key={c.kicker} at={at} style={{ width: 372 }}>
               <Panel w={372} h={300} fill={i === 2 ? C.paperSunk : i === 1 ? C.oak : C.blueSoft} pad={20}>
                 <div style={{ display: "grid", gap: S.s2, alignContent: "start" }}>
-                  <span style={{ ...T.kicker, color: C.ink }}>{c.kicker}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                    <span style={{ ...T.kicker, color: C.ink }}>{c.kicker}</span>
+                    <span style={{ ...T.kicker, fontSize: 11, color: c.role === "exploratory" ? C.inkMuted : C.tealDeep }}>{c.role}</span>
+                  </div>
                   <div style={{ ...T.title, fontSize: 24 }}>{c.n}</div>
                   <div style={{ ...T.body, fontSize: 15, lineHeight: "21px", minHeight: 105 }}>{c.input}</div>
                   <div style={{ display: "flex", width: W, height: 22, gap: 2 }}>
@@ -200,7 +205,7 @@ export const Tasks: React.FC = () => {
                     ))}
                   </div>
                   <div style={{ display: "flex", gap: 14, opacity: p }}>
-                    {["train", "validation", "test, sealed"].map((l, j) => (
+                    {["train", "validation", "held-out test"].map((l, j) => (
                       <span key={l} style={{ ...T.caption, color: j === 2 ? C.coral : C.ink }}>{c.split[j].toLocaleString()} {l}</span>
                     ))}
                   </div>
@@ -212,7 +217,7 @@ export const Tasks: React.FC = () => {
         })}
       </div>
       <Fade at={s(14)} style={{ position: "absolute", bottom: 0, left: 0 }}>
-        <div style={{ ...T.data, color: C.inkMuted }}>Learners and agents see training notes; the host measures validation; the test split is scored once, after every program is frozen.</div>
+        <div style={{ ...T.data, color: C.inkMuted }}>Learners and agents use training records; the host measures validation and performs the final held-out assessment.</div>
       </Fade>
     </Slide>
   );

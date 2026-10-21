@@ -1,127 +1,134 @@
 # CaseDistiller explainer: narration script
 
-17 scenes · 775 words · 6:37 total · 17 scenes timed to measured voice clips, the rest estimated at 2.6 words/s · 0.8 s lead-in and 0.8 s tail per scene.
+18 scenes · 855 words · 8:41 total · 18 scenes timed to measured voice clips, the rest estimated at 2.1 words/s.
 
-Each scene's voice clip starts 0.8 s after the scene begins. Clips live in `public/audio/<Scene id>.wav` (made by `scripts/tts.mjs`); run `node scripts/audio-durations.mjs` after changing them.
+A scene lasts its minimum build time or its voice clip plus lead-in and tail, whichever is longer. The lead-in is 0.8 s (Cover 1.8 s); the tail is 0.8 s (Foil 3 s). Clips live in `public/audio/<Scene id>.wav` (made by `scripts/tts.mjs`); run `node scripts/audio-durations.mjs` after changing them.
 
 | # | Scene | Starts | Length | Voice | Words |
 |---|---|---|---|---|---|
-| 1 | Cover | 0:00 | 24.3 s | 21.6 s | 48 |
-| 2 | Compare | 0:24 | 27.4 s | 25.8 s | 65 |
-| 3 | Approach | 0:51 | 23.8 s | 22.2 s | 50 |
-| 4 | Routes | 1:15 | 20.0 s | 18.4 s | 44 |
-| 5 | Expansion | 1:35 | 18.7 s | 17.1 s | 37 |
-| 6 | Masked | 1:54 | 20.3 s | 18.7 s | 37 |
-| 7 | Candidates | 2:14 | 26.8 s | 25.1 s | 49 |
-| 8 | Selection | 2:41 | 26.7 s | 25.1 s | 52 |
-| 9 | Scorecard | 3:07 | 25.7 s | 24.1 s | 50 |
-| 10 | AgentLoop | 3:33 | 28.4 s | 26.8 s | 51 |
-| 11 | AgentEdit | 4:02 | 21.0 s | 19.4 s | 46 |
-| 12 | Tasks | 4:23 | 21.4 s | 19.8 s | 42 |
-| 13 | Ems | 4:44 | 28.8 s | 27.2 s | 46 |
-| 14 | Act | 5:13 | 24.6 s | 23.0 s | 49 |
-| 15 | Split | 5:37 | 19.4 s | 17.8 s | 34 |
-| 16 | Audit | 5:57 | 21.7 s | 20.1 s | 46 |
-| 17 | Close | 6:18 | 18.2 s | 16.6 s | 29 |
+| 1 | Cover | 0:00 | 30.6 s | 28.0 s | 41 |
+| 2 | Compare | 0:30 | 32.3 s | 30.7 s | 41 |
+| 3 | Approach | 1:02 | 24.7 s | 23.1 s | 41 |
+| 4 | Routes | 1:27 | 29.1 s | 27.5 s | 45 |
+| 5 | Expansion | 1:56 | 20.2 s | 18.6 s | 36 |
+| 6 | Masked | 2:16 | 24.4 s | 22.7 s | 46 |
+| 7 | Candidates | 2:41 | 22.8 s | 21.2 s | 41 |
+| 8 | Foil | 3:04 | 57.0 s | 53.2 s | 106 |
+| 9 | Selection | 4:01 | 23.4 s | 21.8 s | 50 |
+| 10 | Scorecard | 4:24 | 26.0 s | 24.4 s | 47 |
+| 11 | AgentLoop | 4:50 | 32.2 s | 30.6 s | 51 |
+| 12 | AgentEdit | 5:22 | 28.2 s | 26.6 s | 45 |
+| 13 | Tasks | 5:50 | 29.3 s | 27.7 s | 40 |
+| 14 | Ems | 6:20 | 33.8 s | 32.1 s | 49 |
+| 15 | Act | 6:54 | 32.4 s | 30.8 s | 50 |
+| 16 | Split | 7:26 | 24.0 s | 22.4 s | 45 |
+| 17 | Execution | 7:50 | 28.1 s | 26.5 s | 47 |
+| 18 | Close | 8:18 | 22.9 s | 21.3 s | 34 |
 
-## 1. Cover (0:00, 24.3 s)
+## 1. Cover (0:00, 30.6 s)
 
-Suppose you need every patient whose notes describe a suicide attempt, or advanced heart disease, across a whole health system. You could read the notes. You could send each one to a language model. Or you could run one SQL query that you can read, defend, and edit.
+Clinical case identification asks whether a record documents an event or condition under a specified definition. Examples include suspected suicide attempt and advanced heart disease. CaseDistiller learns explicit criteria from labeled records and definition-derived seeds, then exports the classifier as SQL.
 
-> Directed: [warm, curious] Suppose you need every patient whose notes describe a suicide attempt, or advanced heart disease, across a whole health system. You could read the notes. You could send each one to a language model. [short pause] [confident, excited] Or you could run <emphasis>one SQL query</emphasis> that you can read, defend, and edit.
+> Directed: [warm, curious] Clinical case identification asks whether a record documents an event or condition under a specified definition. [short pause] Examples include suspected suicide attempt and advanced heart disease. [confident] CaseDistiller learns explicit criteria from labeled records and definition-derived seeds, then exports the classifier as SQL.
 
-## 2. Compare (0:24, 27.4 s)
+## 2. Compare (0:30, 32.3 s)
 
-Each of the usual routes gives something up. Experts bring judgement, but reading one note at a time is slow and costly. Classical NLP is deterministic, but hard to set up and awkward to edit. A generative LLM is strong, but it needs a model call for every note: a GPU, latency, and logic nobody can read. CaseDistiller keeps the strengths and drops the costs.
+Expert rules, conventional text classifiers, and direct language-model classification offer different trade-offs in construction effort, representation, and inference requirements. CaseDistiller learns an executable rule representation. An optional language model can help refine it during construction; deployment then uses the resulting query.
 
-> Directed: [thoughtful] Each of the usual routes gives something up. Experts bring judgement, but reading one note at a time is slow and costly. Classical NLP is deterministic, but hard to set up and awkward to edit. A generative LLM is strong, but it needs a model call for every note: a GPU, latency, and logic nobody can read. [short pause] [upbeat] CaseDistiller keeps the strengths and <emphasis>drops the costs</emphasis>.
+> Directed: [thoughtful] Expert rules, conventional text classifiers, and direct language-model classification offer different trade-offs in construction effort, representation, and inference requirements. [short pause] CaseDistiller learns an executable rule representation. An optional language model can help refine it during construction; deployment then uses the resulting query.
 
-## 3. Approach (0:51, 23.8 s)
+## 3. Approach (1:02, 24.7 s)
 
-Here is what is new. CaseDistiller learns the case definition itself, as an SQL program that reads like a clinician's checklist. CaseDistiller-Lite learns it on a CPU. CaseDistiller-Agentic lets an LLM agent refine it, but only while it is built. What ships is one SELECT statement. No model, no GPU.
+CaseDistiller-Lite learns Boolean programs or integer scorecards on a CPU. CaseDistiller-Agentic can optionally propose edits, which a host measures and selects. Both paths produce an explicit classifier that runs using native SQL operations. The deployed query does not call an LLM.
 
-> Directed: [energetic, revealing the key idea] Here is what is new. [short pause] CaseDistiller learns the case definition itself, as an SQL program that reads like a clinician's checklist. CaseDistiller-Lite learns it on a CPU. CaseDistiller-Agentic lets an LLM agent refine it, but only while it is built. [short pause] What ships is one SELECT statement. [emphatic] <stress>No model, no GPU.</stress>
+> Directed: [clear, explaining the plan] CaseDistiller-Lite learns Boolean programs or integer scorecards on a CPU. CaseDistiller-Agentic can optionally propose edits, which a host measures and selects. [short pause] Both paths produce an explicit classifier that runs using native SQL operations. [firm] The deployed query does not call an LLM.
 
-## 4. Routes (1:15, 20.0 s)
+## 4. Routes (1:27, 29.1 s)
 
-Here is a learned definition, for suicide attempt in EMS records. A program is an OR of routes; a route is an AND of words. Each route shows the cases it catches and the false alarms it raises. Any matching route flags the note.
+A Boolean program is an OR of routes. Within each route, predicates are joined by AND. Predicates can match phrases, patterns, or numerical values. Any matching route flags the record, and one record can match several routes. These examples come from the learned EMS program.
 
-> Directed: [clear and lively, showing an example] Here is a learned definition, for suicide attempt in EMS records. A program is an or of routes. A route is an and of words. Each route shows the cases it catches and the false alarms it raises. [short pause] Any matching route flags the note.
+> Directed: [clear and lively, showing an example] A Boolean program is an or of routes. Within each route, predicates are joined by and. Predicates can match phrases, patterns, or numerical values. [short pause] Any matching route flags the record, and one record can match several routes. These examples come from the learned EMS program.
 
-## 5. Expansion (1:35, 18.7 s)
+## 5. Expansion (1:56, 20.2 s)
 
-Under the hood, each pattern expands into plain SQL. This one covers four forms of suicide attempt as four pattern tests, and the negation becomes NOT LIKE. The same program renders for SQL Server, DuckDB, and PostgreSQL.
+The renderer translates supported predicates into native SQL operations. This pattern expands into four phrase forms. Text normalization is included in the query, so the exported classifier contains both the matching operations and the decision logic.
 
-> Directed: [matter-of-fact] Under the hood, each pattern expands into plain SQL. This one covers four forms of suicide attempt as four pattern tests, and the negation becomes NOT LIKE. [short pause] The same program renders for SQL Server, DuckDB, and PostgreSQL.
+> Directed: [matter-of-fact] The renderer translates supported predicates into native SQL operations. This pattern expands into four phrase forms. [short pause] Text normalization is included in the query, so the exported classifier contains both the matching operations and the decision logic.
 
-## 6. Masked (1:54, 20.3 s)
+## 6. Masked (2:16, 24.4 s)
 
-Words alone can mislead, so a route can mask exceptions. Depression counts; ST depression, a heart finding, does not; and a note that mentions both still matches. Nested REPLACE erases the exception, then LIKE tests the term.
+A masked phrase suppresses specified occurrences without rejecting the entire record. For the depression predicate, ST depression is an exception. If another depression occurrence remains, the predicate can still match. SQL removes the specified forms with nested REPLACE operations, then tests the remaining text with LIKE.
 
-> Directed: [a little playful, pointing out a trap] Words alone can mislead, so a route can mask exceptions. Depression counts; ST depression, a heart finding, <emphasis>does not</emphasis>; and a note that mentions both still matches. Nested REPLACE erases the exception, then LIKE tests the term.
+> Directed: [a little playful, pointing out a trap] A masked phrase suppresses specified occurrences without rejecting the entire record. For the depression predicate, ST depression is an exception. [short pause] If another depression occurrence remains, the predicate can still match. SQL removes the specified forms with nested REPLACE operations, then tests the remaining text with LIKE.
 
-## 7. Candidates (2:14, 26.8 s)
+## 7. Candidates (2:41, 22.8 s)
 
-CaseDistiller-Lite finds these routes in the words. A phrase inventory, scored by log odds toward positive notes. Then routes: phrases alone and in pairs, prefix patterns, and FOIL information gain, which adds conjuncts. Poisoning alone catches many cases but some false alarms; adding took makes it far more precise.
+Learning starts with the training records. The learner extracts short phrases within sentences or fields and ranks their association with positive labels. Definition-derived seeds, phrase pairs, and generalized patterns contribute candidate routes. Some routes are then extended using FOIL information gain.
 
-> Directed: [engaged, step by step] CaseDistiller-Lite finds these routes in the words. [short pause] A phrase inventory, scored by log odds toward positive notes. Then routes: phrases alone and in pairs, prefix patterns, and FOIL information gain, which adds conjuncts. [short pause] Poisoning alone catches many cases, but some false alarms. [pleased] Adding "took" makes it far more precise.
+> Directed: [engaged, step by step] Learning starts with the training records. The learner extracts short phrases within sentences or fields and ranks their association with positive labels. [short pause] Definition-derived seeds, phrase pairs, and generalized patterns contribute candidate routes. Some routes are then extended using FOIL information gain.
 
-## 8. Selection (2:41, 26.7 s)
+## 8. Foil (3:04, 57.0 s)
 
-Then CaseDistiller-Lite chooses routes together. A local search adds, drops, and swaps routes to minimise one cost: a heavy price for each missed case, a smaller price for each false alarm, and a price for size. Across many weight settings, one hundred and seventy-seven candidates become eleven routes, chosen by validation F1.
+FOIL grows a route one condition at a time. It tests additions among the records that already match. In this illustration, poisoning matches twenty positive and twenty negative training records. Adding took keeps sixteen positives and four negatives: precision rises from fifty to eighty percent. FOIL information gain rewards that increase while accounting for the positive records retained. A more precise condition can have lower gain if it retains fewer positives. A rare condition matching only three positives is rejected because it loses too much coverage. CaseDistiller also requires a minimum precision improvement. Each accepted extension becomes a candidate route. Choosing the complete program comes next.
 
-> Directed: [focused, building momentum] Then CaseDistiller-Lite chooses routes together. A local search adds, drops, and swaps routes to minimise one cost: a heavy price for each missed case, a smaller price for each false alarm, and a price for size. [short pause] Across many weight settings, one hundred and seventy-seven candidates become <emphasis>eleven routes</emphasis>, chosen by validation F1.
+> Directed: [engaged, step by step] FOIL grows a route one condition at a time. It tests additions among the records that already match. [short pause] In this illustration, poisoning matches twenty positive and twenty negative training records. Adding took keeps sixteen positives and four negatives: precision rises from fifty to eighty percent. [short pause] FOIL information gain rewards that increase while accounting for the positive records retained. A more precise condition can have lower gain if it retains fewer positives. [short pause] A rare condition matching only three positives is rejected because it loses too much coverage. CaseDistiller also requires a minimum precision improvement. [short pause] Each accepted extension becomes a candidate route. Choosing the complete program comes next.
 
-## 9. Scorecard (3:07, 25.7 s)
+## 9. Selection (4:01, 23.4 s)
 
-CaseDistiller-Lite can also weigh the same cues instead of requiring them. An L1 logistic regression, rounded to integer points, gives an SQL scorecard. For death within thirty days, hospice adds the most, then comfort and DNR, and some words subtract. A note is flagged once its points pass a threshold.
+A separate local search chooses routes together, adding, dropping, and swapping them. It balances missed cases, false positives, and program size across a grid of weights. In EMS, one hundred and seventy-seven candidates became a pool of one hundred and ten routes. Validation F1 selected a program containing eleven routes.
 
-> Directed: [lighter, offering an alternative] CaseDistiller-Lite can also weigh the same cues instead of requiring them. An L1 logistic regression, rounded to integer points, gives an SQL scorecard. For death within thirty days, hospice adds the most, then comfort and DNR, and some words subtract. [short pause] A note is flagged once its points pass a threshold.
+> Directed: [focused, building momentum] A separate local search chooses routes together, adding, dropping, and swapping them. It balances missed cases, false positives, and program size across a grid of weights. [short pause] In EMS, one hundred and seventy-seven candidates became a pool of one hundred and ten routes. Validation F1 selected a program containing eleven routes.
 
-## 10. AgentLoop (3:33, 28.4 s)
+## 10. Scorecard (4:24, 26.0 s)
 
-CaseDistiller-Agentic goes one step further: an LLM agent edits the program, but the host decides. The agent works through a Pi runtime that exposes host tools only. It sees training metrics, never validation. The host keeps an edit only if development F1 improves, and refuses anything that is not plain SQL.
+A scorecard combines positive and negative evidence as integer points. Each matched predicate contributes once. In the exploratory mortality model, the complete scorecard has one hundred and thirty-nine terms and flags a record when its total reaches three hundred and sixty-six. The displayed terms are an excerpt.
 
-> Directed: [intrigued, then firm] CaseDistiller-Agentic goes one step further: an LLM agent edits the program, [short pause] but <emphasis>the host decides</emphasis>. The agent works through a Pi runtime that exposes host tools only. It sees training metrics, never validation. The host keeps an edit only if development F1 improves, and refuses anything that is not plain SQL.
+> Directed: [lighter, offering an alternative] A scorecard combines positive and negative evidence as integer points. Each matched predicate contributes once. [short pause] In the exploratory mortality model, the complete scorecard has one hundred and thirty-nine terms and flags a record when its total reaches three hundred and sixty-six. The displayed terms are an excerpt.
 
-## 11. AgentEdit (4:02, 21.0 s)
+## 11. AgentLoop (4:50, 32.2 s)
 
-The edits read like a clinician's. For advanced heart disease, the agent carried the learned ejection-fraction bound to the spelled-out term, and added routes for aortic stenosis and transplant. Test F1 rose by about eight points, and nobody, agent or host, ever saw the test notes.
+During optional refinement, the agent inspects training evidence and proposes edits. The host compiles each candidate and measures it on training and validation records. Promotion uses pooled development F1, with smaller programs resolving ties. Validation metrics are not shown to the agent. The final artifact remains within the supported SQL representation.
 
-> Directed: [genuinely impressed] The edits read like a clinician's. For advanced heart disease, the agent carried the learned ejection-fraction bound to the spelled-out term, and added routes for aortic stenosis and transplant. [short pause] Test F1 rose by <emphasis>about eight points</emphasis>, and nobody, agent or host, ever saw the test notes.
+> Directed: [measured, precise] During optional refinement, the agent inspects training evidence and proposes edits. The host compiles each candidate and measures it on training and validation records. [short pause] Promotion uses pooled development F1, with smaller programs resolving ties. Validation metrics are not shown to the agent. The final artifact remains within the supported SQL representation.
 
-## 12. Tasks (4:23, 21.4 s)
+## 12. AgentEdit (5:22, 28.2 s)
 
-Does it hold up? We tested it on three corpora: emergency medical services records for suicide attempt, MIMIC discharge summaries for ten phenotypes, and discharge notes labeled for death within thirty days. Each test split was scored once, after the programs froze.
+For advanced heart disease, the agent extended the ejection-fraction criterion from abbreviations to the spelled-out term, retaining the numerical bounds. In this illustrative run, held-out F1 increased from zero point six three zero to zero point seven zero seven. This shows one selected program edit.
 
-> Directed: [rising interest, turning to the big question] Does it hold up? [short pause] We tested it on three corpora: emergency medical services records for suicide attempt, MIMIC discharge summaries for ten phenotypes, and discharge notes labeled for death within thirty days. Each test split was scored once, after the programs froze.
+> Directed: [interested] For advanced heart disease, the agent extended the ejection-fraction criterion from abbreviations to the spelled-out term, retaining the numerical bounds. [short pause] In this illustrative run, held-out F1 increased from zero point six three zero to zero point seven zero seven. This shows one selected program edit.
 
-## 13. Ems (4:44, 28.8 s)
+## 13. Tasks (5:50, 29.3 s)
 
-Start with suicide attempt. The learned program scores zero point eight zero, the same as NC DETECT, the definition experts wrote by hand. The diagnosis code alone scores near zero point five. And of fifty-five attempts with no code at all, the program still found thirty-three.
+EMS and ACT were the principal case-identification applications. The EMS target required a suspected attempt act; ideation or an uninitiated plan alone was insufficient. ACT covered ten phenotypes. Thirty-day mortality was exploratory. Selected classifiers were evaluated on held-out test splits.
 
-> Directed: [building to a reveal] Start with suicide attempt. The learned program scores zero point eight zero, [short pause] [delighted] <emphasis>the same as NC DETECT</emphasis>, the definition experts wrote by hand. The diagnosis code alone scores near zero point five. [short pause] And of fifty-five attempts with no code at all, the program still found <emphasis>thirty-three</emphasis>.
+> Directed: [clear, setting the stage] EMS and ACT were the principal case-identification applications. The EMS target required a suspected attempt act; ideation or an uninitiated plan alone was insufficient. [short pause] ACT covered ten phenotypes. Thirty-day mortality was exploratory. Selected classifiers were evaluated on held-out test splits.
 
-## 14. Act (5:13, 24.6 s)
+## 14. Ems (6:20, 33.8 s)
 
-Across the ten phenotypes, the SQL program averages zero point six six. Agent refinement closes about half the gap to an LLM that reads every note, landing within zero point zero one five of direct classification. Ten of sixty agent runs improved significantly on their start; none got worse.
+For EMS, the learned Boolean program and NC DETECT both had an F1 point estimate of zero point eight zero, with different precision and recall. The scorecard reached zero point eight three three. Among fifty-five positive encounters without the T fourteen point ninety-one code, the Boolean program identified thirty-three.
 
-> Directed: [confident] Across the ten phenotypes, the SQL program averages zero point six six. Agent refinement closes about half the gap to an LLM that reads every note, landing within <emphasis>zero point zero one five</emphasis> of direct classification. [short pause] Ten of sixty agent runs improved significantly on their start. [firm] None got worse.
+> Directed: [measured] For EMS, the learned Boolean program and NC DETECT both had an F1 point estimate of zero point eight zero, with different precision and recall. The scorecard reached zero point eight three three. [short pause] Among fifty-five positive encounters without the T fourteen point ninety-one code, the Boolean program identified thirty-three.
 
-## 15. Split (5:37, 19.4 s)
+## 15. Act (6:54, 32.4 s)
 
-The averages hide a pattern. SQL leads where a few phrases carry the definition: alcohol abuse, cancer, depression. Direct classification leads where the note must be read as a whole. These gaps are descriptive.
+Across ACT, Boolean-program macro-F1 increased from zero point six six zero to zero point six seven six with Qwen and zero point six eight zero with GLM. Ten of sixty refinement runs had statistically significant increases; no significant decrease was detected in that group. Comparisons with direct classification were descriptive.
 
-> Directed: [curious, noticing something] The averages hide a pattern. SQL leads where a few phrases carry the definition: alcohol abuse, cancer, depression. Direct classification leads where the note must be read as a whole. These gaps are descriptive.
+> Directed: [confident, careful] Across ACT, Boolean-program macro-F1 increased from zero point six six zero to zero point six seven six with Qwen and zero point six eight zero with GLM. [short pause] Ten of sixty refinement runs had statistically significant increases; no significant decrease was detected in that group. Comparisons with direct classification were descriptive.
 
-## 16. Audit (5:57, 21.7 s)
+## 16. Split (7:26, 24.0 s)
 
-And every program can be checked. All one hundred and seventy-two frozen programs ran in SQLite and selected exactly the evaluator's cohort. Eleven of sixty-four routes were flagged as shortcuts, and removing one is a one-line edit. Agents rarely removed them; that is the reviewer's job.
+Performance varied by phenotype. The highest observed SQL-condition F1 exceeded both direct classifiers for alcohol abuse, advanced cancer, and depression. At least one direct model had a higher point estimate for the other seven phenotypes. These retrospective comparisons do not establish why the methods differ.
 
-> Directed: [earnest and reassuring] And every program can be checked. All one hundred and seventy-two frozen programs ran in SQLite and selected <emphasis>exactly</emphasis> the evaluator's cohort. [short pause] Eleven of sixty-four routes were flagged as shortcuts, and removing one is a one-line edit. Agents rarely removed them; that is the reviewer's job.
+> Directed: [curious, careful] Performance varied by phenotype. The highest observed SQL-condition F1 exceeded both direct classifiers for alcohol abuse, advanced cancer, and depression. At least one direct model had a higher point estimate for the other seven phenotypes. [short pause] These retrospective comparisons do not establish why the methods differ.
 
-## 17. Close (6:18, 18.2 s)
+## 17. Execution (7:50, 28.1 s)
 
-CaseDistiller: accurate enough, auditable, and CPU-only. A definition you can read, an LLM you can send home, and a query you can run tomorrow. The code is on GitHub.
+All one hundred and seventy-two final programs produced identical SQL and evaluator predictions on the records checked in SQLite: all EMS and ACT test records, and the first fifteen hundred LCD test records. This supports execution consistency on those inputs. Clinical validity and usability require separate evaluation.
 
-> Directed: [upbeat, wrapping up with a smile] CaseDistiller: accurate enough, auditable, and CPU-only. [short pause] A definition you can read, an LLM you can send home, and a query you can run tomorrow. [warm] The code is on GitHub.
+> Directed: [earnest and precise] All one hundred and seventy-two final programs produced identical SQL and evaluator predictions on the records checked in SQLite: all EMS and ACT test records, and the first fifteen hundred LCD test records. [short pause] This supports execution consistency on those inputs. Clinical validity and usability require separate evaluation.
+
+## 18. Close (8:18, 22.9 s)
+
+CaseDistiller learns explicit case classifiers from labeled clinical records, supports optional LLM refinement during construction, and exports native SQL. Its evaluation showed selective refinement gains. Applying the classifiers in another setting requires evaluation there.
+
+> Directed: [warm, wrapping up] CaseDistiller learns explicit case classifiers from labeled clinical records, supports optional LLM refinement during construction, and exports native SQL. Its evaluation showed selective refinement gains. [short pause] Applying the classifiers in another setting requires evaluation there.

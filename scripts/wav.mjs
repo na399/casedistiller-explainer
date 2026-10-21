@@ -37,10 +37,12 @@ export function analyse({ rate, samples }) {
   };
 }
 
-export function trim(wav, padSeconds = 0.05) {
+// Keeps more after the speech than before it: word-final consonants (the 'tive' in
+// 'descriptive') fall below the -40 dBFS gate, and a tight pad clipped them.
+export function trim(wav, padStart = 0.1, padEnd = 0.4) {
   const a = analyse(wav);
-  const s = Math.max(0, Math.floor((a.start - padSeconds) * wav.rate));
-  const e = Math.min(wav.samples.length, Math.ceil((a.end + padSeconds) * wav.rate));
+  const s = Math.max(0, Math.floor((a.start - padStart) * wav.rate));
+  const e = Math.min(wav.samples.length, Math.ceil((a.end + padEnd) * wav.rate));
   return { rate: wav.rate, samples: wav.samples.subarray(s, e) };
 }
 

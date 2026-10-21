@@ -1,5 +1,5 @@
-// Numbers from the CaseDistiller Results Atlas (SUMMARY block, status 20 October 2026)
-// and from manuscript.md (abstract, Results, Figure 4, Supplementary Table S3).
+// Numbers from the CaseDistiller Results Atlas (SUMMARY block, status 20 October 2026),
+// checked against the revised manuscript.md (Results, Table 2, Table 4, Figure 2).
 export type Row = {
   task: string; name: string;
   sql: number; sql_scorecard: number; sql_qwen: number; sql_glm: number;
@@ -29,7 +29,8 @@ export const bestSql = (r: Row) => Math.max(...SQL_KEYS.map((k) => r[k]));
 export const bestDirect = (r: Row) => Math.max(r.direct_qwen, r.direct_glm);
 export const f3 = (x: number) => x.toFixed(3);
 
-// EMS SQL program (atlas PROGRAMS.ems.sql), first routes in listing order.
+// EMS Boolean program (atlas PROGRAMS.ems.sql), first routes in listing order, with held-out
+// test TP/FP per route. Route counts overlap: a record can match several routes.
 export const EMS_ROUTES = [
   { rule: "phrase('suicide attempt', except ⇒ ('behavior suicide attempt')) AND phrase('t14.91')", tp: 29, fp: 1 },
   { rule: "like(' appro(priate|ximately) ') AND phrase('overdose')", tp: 10, fp: 2 },
@@ -39,9 +40,57 @@ export const EMS_ROUTES = [
   { rule: "phrase('poisoning') AND phrase('took')", tp: 21, fp: 3 },
 ];
 
-// LCD SQL scorecard (atlas PROGRAMS.lcd.sql_scorecard): threshold 366, 139 terms.
+// LCD SQL scorecard, exploratory task: threshold 366, 139 terms. The ten-term excerpt is the
+// one the manuscript reports (Results, program excerpts).
 export const LCD_TERMS = [
   { term: "hospice", points: 100 }, { term: "comfort", points: 97 }, { term: "dnr", points: 88 },
-  { term: "metastatic", points: 60 }, { term: "palliative", points: 48 }, { term: "facility", points: 41 },
-  { term: "goals of", points: 35 }, { term: "shower", points: -29 }, { term: "ambulating", points: -28 },
+  { term: "metastatic", points: 60 }, { term: "palliative", points: 48 }, { term: "shower", points: -29 },
+  { term: "ambulating", points: -28 }, { term: "ambulatory independent", points: -27 },
+  { term: "take your", points: -27 }, { term: "ambulatory", points: -24 },
 ];
+export const LCD_THRESHOLD = 366;
+export const LCD_TERM_COUNT = 139;
+
+// EMS held-out test results (manuscript Results and Table 2).
+export const EMS = {
+  test: { records: 275, positives: 84 },
+  program: { f1: 0.8, ci: [0.726, 0.865], precision: 0.87, recall: 0.74 },
+  ncDetect: { f1: 0.8, ci: [0.731, 0.857], precision: 0.75, recall: 0.857 },
+  scorecard: { f1: 0.833, ci: [0.767, 0.89] },
+  t1491: { f1: 0.509, ci: [0.396, 0.618] },
+  withoutT1491: { positives: 55, program: 33, scorecard: 41 },
+};
+
+// Final-program execution checks (manuscript Table 4): SQLite against the CaseDistiller-Lite
+// evaluator on all EMS and ACT test records and the first 1,500 LCD test records.
+export const EXECUTION = [
+  { task: "EMS", agree: 18, total: 18, scope: "all 275 test records" },
+  { task: "ACT", agree: 140, total: 140, scope: "all 322 test summaries" },
+  { task: "LCD", agree: 14, total: 14, scope: "first 1,500 test notes" },
+];
+
+// ---------------------------------------------------------------------------------------
+// FOIL route-growth ILLUSTRATION. Synthetic training counts constructed for teaching; these
+// are NOT reported EMS training results. Everything shown in the Foil scene derives from here.
+export const FOIL_START = { route: "phrase('poisoning')", p: 20, n: 20 };
+export const FOIL_ADDITIONS = [
+  { id: "took", label: "AND phrase('took')", p: 16, n: 4 },
+  { id: "other", label: "AND another candidate term", p: 12, n: 2 },
+  { id: "rare", label: "AND a rare candidate term", p: 3, n: 0 },
+];
+// CaseDistiller growth settings reported in the manuscript (not universal FOIL properties).
+export const FOIL_RULES = { minRetained: 0.5, minPositives: 2, seMultiplier: 1.5, maxConjuncts: 3 };
+
+export const precision = (p: number, n: number) => p / (p + n);
+// FOIL gain = p1 · log2(P1 / P0), with P = p / (p + n).
+export const foilGain = (p0: number, n0: number, p1: number, n1: number) =>
+  p1 * Math.log2(precision(p1, n1) / precision(p0, n0));
+export const foilCheck = (add: { p: number; n: number }) => {
+  const P0 = precision(FOIL_START.p, FOIL_START.n), P1 = precision(add.p, add.n);
+  const retainedOk = add.p >= FOIL_RULES.minRetained * FOIL_START.p && add.p >= FOIL_RULES.minPositives;
+  const precisionOk = P1 - P0 >= FOIL_RULES.seMultiplier * Math.sqrt((P0 * (1 - P0)) / (add.p + add.n));
+  return {
+    precision: P1, retained: add.p / FOIL_START.p, gain: foilGain(FOIL_START.p, FOIL_START.n, add.p, add.n),
+    retainedOk, precisionOk, eligible: retainedOk && precisionOk,
+  };
+};
